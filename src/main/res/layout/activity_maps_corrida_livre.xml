@@ -1,0 +1,164 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/start_updates_button"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:onClick="startUpdatesButtonHandler"
+                    android:layout_height="50dp"
+                    android:background="@android:drawable/btn_default"
+                    android:text="Começar"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/stop_updates_button"
+                    android:gravity="center"
+                    android:onClick="stopUpdatesButtonHandler"
+                    android:background="@android:drawable/btn_default"
+                    android:layout_width="match_parent"
+                    android:text="Parar "
+                    android:layout_height="50dp"
+                    android:elevation="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:text="Calibrar Sensor"
+                    android:id="@+id/btnCalibrarSensor"
+                    android:onClick="calibrarSensor"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/doGraphics"
+                    android:background="@android:drawable/btn_default"
+                    android:text="Fazer Gráficos"
+                    android:onClick="geraGraficosHandler"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:id="@+id/scan"
+                    android:background="@android:drawable/btn_default"
+                    android:text="Ligar Bluetooth"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:text="BTs Pairados"
+                    android:layout_width="match_parent"
+                    android:id="@+id/PairedBtn"
+
+                    android:background="@android:drawable/btn_default"
+                    android:layout_height="50dp"
+                    android:elevation="0dp"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/discover"
+                    android:background="@android:drawable/btn_default"
+                    android:text="Descobrir Dispositivos"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:layout_height="50dp"
+                    android:id="@+id/off"
+
+                    android:layout_weight="1"
+                    android:background="@android:drawable/btn_default"
+                    android:text="Desligar Bluetooth"
+                    android:layout_width="match_parent" />
+            </LinearLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:weightSum="1">
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="355"
+                        android:id="@+id/devicesListView" />
+                </LinearLayout>
+            </ScrollView>
+
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                tools:context="com.example.jsampaio.interfaceveloguia.MapsCorridaLivreActivity"
+                android:layout_width="match_parent"
+                android:layout_height="392dp"
+                android:layout_weight="140.82" />
+
+            <view
+                android:layout_width="match_parent"
+                android:layout_height="154dp"
+                class="com.github.mikephil.charting.charts.LineChart"
+                android:id="@+id/heartRateChart"
+                android:visibility="invisible"
+                />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/bluetoothStatus" />
+
+            <TextView
+                android:text="Ler Buffer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/readBuffer" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
