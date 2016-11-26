@@ -13,12 +13,17 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:scrollbarStyle="outsideOverlay"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="23dp"
+        android:layout_marginBottom="10dp">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
             android:id="@+id/LinearLayout"
@@ -33,10 +38,9 @@
 
             <view
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="131dp"
                 class="com.github.mikephil.charting.charts.LineChart"
-                android:id="@+id/altLinearChart"
-                android:layout_weight="0.36" />
+                android:id="@+id/altLinearChart" />
 
             <TextView
                 android:text="Velocidade"
@@ -47,10 +51,9 @@
 
             <view
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="136dp"
                 class="com.github.mikephil.charting.charts.LineChart"
-                android:id="@+id/spdLinearChart"
-                android:layout_weight="0.36" />
+                android:id="@+id/spdLinearChart" />
 
             <TextView
                 android:text="Pulsação"
@@ -61,10 +64,9 @@
 
             <view
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="214dp"
                 class="com.github.mikephil.charting.charts.LineChart"
-                android:id="@+id/pulseLinearChart"
-                android:layout_weight="0.36" />
+                android:id="@+id/pulseLinearChart" />
 
         </LinearLayout>
     </ScrollView>

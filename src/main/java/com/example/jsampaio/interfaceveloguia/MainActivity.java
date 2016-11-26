@@ -84,14 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    // método que chama a tela de configurar o bluetooth
-    public void configBT() {
-
-        Intent chamarTela2 = new Intent(this, MainBluetoothActivity.class);
-        startActivity(chamarTela2);
-    }
-
-
 
     // método que me direciona a tela2 do exemplo
     public void mapsCorrida() {

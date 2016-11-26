@@ -1,5 +1,6 @@
 package com.example.jsampaio.interfaceveloguia;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -10,9 +11,11 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -405,21 +408,27 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
      * Handles the Start Updates button and requests start of location updates. Does nothing if
      * updates have already been requested.
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void startUpdatesButtonHandler(View view) {
 
 
         if (!mRequestingLocationUpdates) {
-            rectOptions= new PolylineOptions();
-            mRequestingLocationUpdates = true;
-            setButtonsEnabledState();
-            startLocationUpdates();
-            mDiscoverBtn.setEnabled(false);
-            mListPairedDevicesBtn.setEnabled(false);
-            mOffBtn.setEnabled(false);
-            mScanBtn.setEnabled(false);
-            modoDeRecebimento = "<batimed>\0";
-            mConnectedThread.write(modoDeRecebimento);
-            mHeartRateChart.setVisibility(View.INVISIBLE);
+            if(mBTAdapter.getBluetoothLeScanner()!=null) {
+                rectOptions = new PolylineOptions();
+                mRequestingLocationUpdates = true;
+                setButtonsEnabledState();
+                startLocationUpdates();
+                mDiscoverBtn.setEnabled(false);
+                mListPairedDevicesBtn.setEnabled(false);
+                mOffBtn.setEnabled(false);
+                mScanBtn.setEnabled(false);
+                modoDeRecebimento = "<batimed>\0";
+                mConnectedThread.write(modoDeRecebimento);
+                mHeartRateChart.setVisibility(View.INVISIBLE);
+              //  mMap.clear();
+            }else{
+                    Toast.makeText(getApplicationContext(), "Bluetooth não está ligado", Toast.LENGTH_SHORT).show();
+            }
 
         }
     }
@@ -460,11 +469,7 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
 
     public void setLatLngFinal()
     {
-        mLatitudeDouble = latVector.get(latVector.size()-1);
-        mLongitudeDouble = lngVector.get(lngVector.size()-1);
-
-
-        addNewMarkerRoute((double)mLatitudeDouble, (double)mLongitudeDouble);
+        addLastMarkerRoute((double)mLatitudeDouble, (double)mLongitudeDouble);
     }
 
 
@@ -511,43 +516,38 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
      */
     private void updateUI() {
 
-
-        //Atribuicao das coordenadas Lat Lgn
-        mLatitudeDouble = (float)mCurrentLocation.getLatitude();
-        mLongitudeDouble = (float)mCurrentLocation.getLongitude();
-        mAltitudeDouble = (float)mCurrentLocation.getAltitude();
-        mSpeedFloat = mCurrentLocation.getSpeed();
-
-        mLatitudeTextView.setText(String.format("%s: %f", mLatitudeLabel,
-                mLatitudeDouble));
-        mLongitudeTextView.setText(String.format("%s: %f", mLongitudeLabel,
-                mLongitudeDouble));
-        mLastUpdateTimeTextView.setText(String.format("%s: %s", mLastUpdateTimeLabel,
-                mLastUpdateTime));
-        mAltitudeTextView.setText(String.format("%s: %f", mAltitudeLabel,
-                mAltitudeDouble));
-        mSpeedTextView.setText(String.format("%s: %f", mSpeedLabel,
-                mSpeedFloat));
-
-        latVector.add(mLatitudeDouble);
-
-        lngVector.add(mLongitudeDouble);
-
-        altVector.add(mAltitudeDouble);
-
-        speedVector.add(mSpeedFloat);
+        if(mLatitudeDouble != (float)mCurrentLocation.getLatitude() || mLongitudeDouble !=
+                (float)mCurrentLocation.getLongitude()) {
+            //Atribuicao das coordenadas Lat Lgn
+            mLatitudeDouble = (float) mCurrentLocation.getLatitude();
+            mLongitudeDouble = (float) mCurrentLocation.getLongitude();
+            mAltitudeDouble = (float) mCurrentLocation.getAltitude();
+            mSpeedFloat = mCurrentLocation.getSpeed();
 
 
-        rectOptions.add(new LatLng(mLatitudeDouble,mLongitudeDouble));
+            latVector.add(mLatitudeDouble);
 
-        //    polyline.setColor(Color.YELLOW); //EU AINDA NÃO SEI ARRUMAR ESSA PORRA DE COR
-        polyline = mMap.addPolyline(rectOptions.geodesic(true).color(Color.BLUE).width(12));
+            lngVector.add(mLongitudeDouble);
 
-        moveCamera((double)mLatitudeDouble, (double)mLongitudeDouble);
+            altVector.add(mAltitudeDouble);
 
-        if(latVector.size() ==1) {
-            addNewMarkerRoute((double) mLatitudeDouble, (double) mLongitudeDouble);
+            speedVector.add(mSpeedFloat);
+
+
+            rectOptions.add(new LatLng(mLatitudeDouble, mLongitudeDouble));
+
+            //    polyline.setColor(Color.YELLOW); //EU AINDA NÃO SEI ARRUMAR ESSA PORRA DE COR
+            polyline = mMap.addPolyline(rectOptions.geodesic(true).color(Color.BLUE).width(12));
+
+            moveCamera((double) mLatitudeDouble, (double) mLongitudeDouble);
+
+            if (latVector.size() == 1) {
+                addFirstMarkerRoute((double) mLatitudeDouble, (double) mLongitudeDouble);
+
+
+            }
         }
+    }
 /*      }
         addPolyline();
 
@@ -561,27 +561,10 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
 
        // dadosBluetooth();
 
-    }
 
     /**
      * Adicioanar uma polyline, em que o início é um marker
      */
-
-    protected void addPolyline()
-    {
-        rectOptions.add(new LatLng(mLatitudeDouble,mLongitudeDouble));
-
-        if(vetorPolyline == 0)
-        {
-            addNewMarkerRoute((double)mLatitudeDouble, (double)mLongitudeDouble);
-            //Variável contadora
-            vetorPolyline++;
-        }
-
-        polyline = mMap.addPolyline(rectOptions);
-
-
-    }
 
 
 
@@ -596,7 +579,7 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
 
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(cordUTFPR));
         LatLng coordenada = new LatLng(lat, lgn);
-        camera_position = new CameraPosition(coordenada,30, 0,0);
+        camera_position = new CameraPosition(coordenada,20, 0,0);
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera_position), 1000, null);
 
 
@@ -609,10 +592,25 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
      * Retorno:    NULL
      */
 
-    protected void addNewMarkerRoute(Double lat, Double lgn)
+    protected void addLastMarkerRoute(Double lat, Double lgn)
     {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Minha posição").
-                icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Posição Atual")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green)));
+
+    }
+
+
+    /**
+     * Adiciona um Marker na posição indicada com a cor desejada
+     * Parâmetros: lat -> latitude
+     *             lgn -> longitude
+     * Retorno:    NULL
+     */
+
+    protected void addFirstMarkerRoute(Double lat, Double lgn)
+    {
+        mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Posição Atual")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_blue)));
 
     }
 
@@ -716,7 +714,7 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();
-        Toast.makeText(this, getResources().getString(R.string.location_updated_message),
+        Toast.makeText(this, "Localização Atualizada",
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -724,7 +722,7 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
-        Log.i(TAG, "Connection suspended");
+        Log.i(TAG, "Conexão suspendida");
         mGoogleApiClient.connect();
     }
 
@@ -732,7 +730,7 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
     public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
         // onConnectionFailed.
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+        Log.i(TAG, "Conexão Falhou: ConnectionResult.getErrorCode() = " + result.getErrorCode());
     }
 
 
@@ -767,10 +765,41 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
 
         // mMap.addMarker(new MarkerOptions().position().title("Minha posição"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(cordUTFPR));
-        camera_position = new CameraPosition(cordCuritiba,10, 0,0);
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera_position), 3000, null);
-
+        //camera_position = new CameraPosition(cordCuritiba,10, 0,0);
+        //mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera_position), 3000, null);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
     }
+
+    private void handleNewLocation(Location location) {
+        Log.d(TAG, location.toString());
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+
+        mLatitudeDouble =(float) currentLatitude;
+        mLongitudeDouble = (float)currentLongitude;
+
+        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+
+
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .title("Eu estou Aqui!");
+        mMap.addMarker(options);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+    }
+
+
+
 
     protected void passarDadosParaOutraAtividade()
     {
@@ -886,17 +915,17 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
         // Check if the device is already discovering
         if(mBTAdapter.isDiscovering()){
             mBTAdapter.cancelDiscovery();
-            Toast.makeText(getApplicationContext(),"Discovery stopped",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"A descoberta parou",Toast.LENGTH_SHORT).show();
         }
         else{
             if(mBTAdapter.isEnabled()) {
                 mBTArrayAdapter.clear(); // clear items
                 mBTAdapter.startDiscovery();
-                Toast.makeText(getApplicationContext(), "Discovery started", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Descoberta Começou", Toast.LENGTH_SHORT).show();
                 registerReceiver(blReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
             }
             else{
-                Toast.makeText(getApplicationContext(), "Bluetooth not on", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Bluetooth não ligado", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -921,17 +950,17 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
             for (BluetoothDevice device : mPairedDevices)
                 mBTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
 
-            Toast.makeText(getApplicationContext(), "Show Paired Devices", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Mostrando dispositivos pairados", Toast.LENGTH_SHORT).show();
         }
         else
-            Toast.makeText(getApplicationContext(), "Bluetooth not on", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Bluetooth não está ligado", Toast.LENGTH_SHORT).show();
     }
 
     public AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
 
             if(!mBTAdapter.isEnabled()) {
-                Toast.makeText(getBaseContext(), "Bluetooth not on", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Bluetooth não está ligado", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -1067,16 +1096,16 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
 
                 if(msg.what == CONNECTING_STATUS){
                     if(msg.arg1 == 1)
-                        mBluetoothStatus.setText("Connected to Device: " + (String)(msg.obj));
+                        mBluetoothStatus.setText("Conectado com o dispositivo: " + (String)(msg.obj));
                     else
-                        mBluetoothStatus.setText("Connection Failed");
+                        mBluetoothStatus.setText("Falha na Conexão");
                 }
             }
         };
 
         if (mBTArrayAdapter == null) {
             // Device does not support Bluetooth
-            mBluetoothStatus.setText("Status: Bluetooth not found");
+            mBluetoothStatus.setText("Status: não encontrado");
             Toast.makeText(getApplicationContext(),"Bluetooth device not found!",Toast.LENGTH_SHORT).show();
         }
         else {
@@ -1114,9 +1143,14 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
                 @Override
                 public void onClick(View v)
                 {
-                    modoDeRecebimento = "<instant>\0";
-                    mConnectedThread.write(modoDeRecebimento);
-                    mHeartRateChart.setVisibility(View.VISIBLE);
+                    if(mBTAdapter.isEnabled()) {
+                        modoDeRecebimento = "<instant>\0";
+                        mConnectedThread.write(modoDeRecebimento);
+                        mHeartRateChart.setVisibility(View.VISIBLE);
+                        Toast.makeText(getApplicationContext(),"Use o gráfico para calibrar",Toast.LENGTH_SHORT).show();
+                    }else
+                        Toast.makeText(getApplicationContext(), "Bluetooth não está ligado", Toast.LENGTH_SHORT).show();
+
                 }
             });
 
@@ -1139,6 +1173,7 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
                 dataset.setDrawCircles(false);
                 dataset.setDrawCircleHole(false);
                 dataset.setDrawValues(false);
+                dataset.setColor(Color.RED);
 
 
                 List<String> labels = new ArrayList<>();
@@ -1154,7 +1189,7 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
                 mHeartRateChart.setDrawGridBackground(false);
                 mHeartRateChart.setData(data);
                 mHeartRateChart.setTouchEnabled(false);
-                mHeartRateChart.setDescription("");
+                mHeartRateChart.setDescription("Calibragem da pulsação");
                 mHeartRateChart.getAxisLeft().setDrawLabels(false);
                 mHeartRateChart.getAxisLeft().setDrawGridLines(false);
                 mHeartRateChart.getAxisRight().setDrawLabels(false);
@@ -1171,13 +1206,6 @@ public class MapsCorridaLivreActivity extends FragmentActivity implements
 
     }
 
-
-    protected void startCalibrarSensorActivity(View view)
-    {
-        Intent nextActivity = new Intent(this, calibrarSensorActivity.class);
-        startActivity(nextActivity);
-
-    }
 
     public class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;

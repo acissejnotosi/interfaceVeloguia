@@ -52,7 +52,7 @@ public class GeraGraficos extends AppCompatActivity {
         geraGraficoYDoubleXint(altArray, maltLinearChart, altMax, altMin);
         geraGraficoYDoubleXint(spdArray, mspdLinearChart, spdMax, spdMin);
 
-        geraGraficoInt(pulseArray,mPulseLinearChart, pulseMax, pulseMin);
+        geraGraficoInt(pulseArray,mPulseLinearChart, pulseMax, pulseMin, "Frequência Cardíaca");
     }
 
 
@@ -77,10 +77,9 @@ public class GeraGraficos extends AppCompatActivity {
 
 
         dataset.setDrawCubic(false);
-        dataset.setDrawCircles(false);
+        dataset.setDrawCircles(true);
         dataset.setDrawCircleHole(false);
         dataset.setDrawValues(false);
-
 
 
         for(i=0;i<floatList.length;i++)
@@ -148,7 +147,7 @@ public class GeraGraficos extends AppCompatActivity {
 
     }
 
-    protected void geraGraficoInt(int[] floatList, LineChart mLinearChart, int latMax, int latMin)
+    protected void geraGraficoInt(int[] floatList, LineChart mLinearChart, int latMax, int latMin, String description)
     {
 
         XAxis xAxis = mLinearChart.getXAxis();
@@ -169,9 +168,13 @@ public class GeraGraficos extends AppCompatActivity {
 
 
         dataset.setDrawCubic(false);
-        dataset.setDrawCircles(false);
+        dataset.setDrawCircles(true);
         dataset.setDrawCircleHole(false);
+        dataset.setCircleColor(Color.LTGRAY);
         dataset.setDrawValues(false);
+        dataset.setHighlightEnabled(true);
+        dataset.setDrawHighlightIndicators(true);
+        dataset.setHighLightColor(Color.BLUE);
 
 
 
@@ -182,23 +185,32 @@ public class GeraGraficos extends AppCompatActivity {
 
 
 
-        data.setHighlightEnabled(false);
+        data.setHighlightEnabled(true);
+        data.setDrawValues(true);
+        data.setValueTextSize(6.0f);
+        data.setValueTextColor(Color.BLUE);
+
+
         //mLinearChart.setClickable(false);
         mLinearChart.setDrawGridBackground(false);
         mLinearChart.setData(data);
         mLinearChart.enableScroll();
-        mLinearChart.setDescription("");
         mLinearChart.getAxisLeft().setDrawLabels(false);
-        mLinearChart.getAxisRight().setDrawLabels(false);
-        mLinearChart.getAxisLeft().setAxisMaxValue(1.0f);
-        mLinearChart.getAxisLeft().setAxisMinValue(-0.0f);
+        mLinearChart.getAxisRight().setDrawLabels(true);
+        mLinearChart.getAxisRight().setAxisMaxValue(1.0f);
+        mLinearChart.getAxisRight().setAxisMinValue(-0.0f);
         mLinearChart.getXAxis().setDrawGridLines(false);
-        mLinearChart.getXAxis().setDrawAxisLine(true);
+        mLinearChart.getXAxis().setDrawAxisLine(false);
+        mLinearChart.getXAxis().setDrawLabels(true);
+
         mLinearChart.setHorizontalScrollBarEnabled(true);
         mLinearChart.setMinimumHeight(200);
         mLinearChart.setMinimumWidth(200);
         mLinearChart.getLineData().getDataSets().get(0).setColor(Color.BLUE);
         mLinearChart.setScrollX(50);
+        mLinearChart.setDescription(description);
+        mLinearChart.valuesToHighlight();
+
 
         /*
             Interaction with the chart
@@ -234,9 +246,9 @@ public class GeraGraficos extends AppCompatActivity {
             Permitir que quando tocado mostre o valor de x,y
          */
         // highlight the entry and x-position 50 in the first (0) DataSet
-        Highlight highlight = new Highlight(50, 0);
+        //Highlight highlight = new Highlight(50, 0);
 
-        mLinearChart.highlightValue(highlight, false); // highlight this value, don't call listener
+
 
     }
     protected void geraGraficoYIntxint(Vector<Integer> integerVector )

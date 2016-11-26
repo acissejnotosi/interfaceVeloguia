@@ -99,5 +99,9 @@
     <string name="title_activity_maps_rota_solicitada">Map</string>
 
     <string name="access_token">sk.eyJ1IjoiamVzc2ljYWlzb3RvbiIsImEiOiJjaXZrZDB0Z2MwNWZmMnRwb2JmNTl0b2szIn0.RY3jwA75CwfhX-gJ_ZvwUw</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 </resources>
